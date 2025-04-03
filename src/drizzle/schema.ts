@@ -6,7 +6,7 @@ import {
   integer,
   pgEnum,
   pgTable,
-  // primaryKey,
+  primaryKey,
   real,
   serial,
   text,
