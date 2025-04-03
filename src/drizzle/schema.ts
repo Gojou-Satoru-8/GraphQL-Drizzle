@@ -2,18 +2,18 @@ import { between, gte, lte, relations, sql } from "drizzle-orm";
 import {
   boolean,
   check,
-  // index,
+  index,
   integer,
   pgEnum,
   pgTable,
-  // primaryKey,
+  primaryKey,
   real,
   serial,
   text,
   timestamp,
-  // unique,
+  unique,
   uniqueIndex,
-  // uuid,
+  uuid,
   varchar,
 } from "drizzle-orm/pg-core";
 
