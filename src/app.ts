@@ -19,7 +19,7 @@ const server = new ApolloServer({
     Query: {
       hello: () => "Hello world!",
       hello2: () => "Hello world!",
-      users: async () => (await db.select().from(Users)).values(),
+      // users: async () => (await db.select().from(Users)).values(),
     },
   },
 });

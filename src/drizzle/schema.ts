@@ -24,6 +24,7 @@ import {
 export const pgRole = pgEnum("user_role", ["admin", "basic", "guest"]);
 export const pgStatus = pgEnum("user_status", ["active", "inactive", "banned"]);
 export const pgPriority = pgEnum("priority", ["low", "medium", "high"]);
+export const pgTheme = pgEnum("theme", ["light", "dark", "system"]);
 
 export const Users = pgTable(
   "users",
@@ -58,6 +59,7 @@ export const UserPreferences = pgTable("user_preferences", {
     .references(() => Users.id) // Foreign key constraint: 1 : 1
     .notNull()
     .unique(),
+  theme: pgTheme().default("light").notNull(),
 });
 
 export const Todos = pgTable(
@@ -110,6 +112,24 @@ export const UserTableRelations = relations(Users, ({ one, many }) => {
 });
 
 export const UserPreferencesRelations = relations(UserPreferences, ({ one }) => ({
-  // NOTE: For 1:1 mappings, the fields contains the id of the current table, and the references contains the id of the parent (or referenced) table.
+  // NOTE:  In child tables, which respectively, specifiy the FK column in current table, PK column in references table. This is done in order to populate parent table with child's rows using with when querying.
   user: one(Users, { fields: [UserPreferences.userId], references: [Users.id] }),
+}));
+
+export const TodosRelations = relations(Todos, ({ one, many }) => ({
+  // As Todos is child here, and has an authorId FK, gotta specify {fields, references}
+  author: one(Users, { fields: [Todos.authorId], references: [Users.id] }),
+  // For below Todos is the parent
+  todoCategory: many(TodoCategories),
+}));
+
+export const TodoCategoriesRelations = relations(TodoCategories, ({ one, many }) => ({
+  // This table is child here, has a todoId FK, so we specify {fields, references}
+  todo: one(Todos, { fields: [TodoCategories.todoId], references: [Todos.id] }),
+  // Same as above, this table is child here, has a categoryId FK
+  category: one(Categories, { fields: [TodoCategories.categoryId], references: [Categories.id] }),
+}));
+
+export const CategoriesRelations = relations(Categories, ({ one, many }) => ({
+  todoCategories: many(TodoCategories),
 }));
