@@ -78,10 +78,17 @@ export const updateUserById = async (req: Request, res: Response) => {
 
 export const deleteUserById = async (req: Request, res: Response) => {
   const userId = +req.params.id;
-  const deletedUser = await userService.deleteUserById(userId);
-
-  if (!deletedUser) return res.status(404).json({ success: false, message: "User not found" });
-  return res
-    .status(200)
-    .json({ success: true, message: "User deleted successfully", user: deletedUser });
+  try {
+    const deletedUser = await userService.deleteUserById(userId);
+    if (!deletedUser) return res.status(404).json({ success: false, message: "User not found" });
+    return res
+      .status(200)
+      .json({ success: true, message: "User deleted successfully", user: deletedUser });
+  } catch (error) {
+    console.error("🚀 ~ deleteUserById ~ error:", error);
+    return res.status(200).json({
+      success: false,
+      message: error instanceof Error ? error.message : "Failed to delete",
+    });
+  }
 };

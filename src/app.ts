@@ -3,10 +3,10 @@ import helmet from "helmet";
 import cors from "cors";
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
-import { schema } from "./graphql/schema";
+import { schema } from "./graphql";
 import { errorMiddleware } from "@/middlewares/error.js";
 import userRouter from "@/routes/user.router";
-import { db } from "./drizzle/database";
+import { db } from "./drizzle";
 import { Users } from "./drizzle/schema";
 
 export const envMode = process.env.NODE_ENV?.trim() || "DEVELOPMENT";
@@ -19,7 +19,19 @@ const server = new ApolloServer({
     Query: {
       hello: () => "Hello world!",
       hello2: () => "Hello world!",
-      // users: async () => (await db.select().from(Users)).values(),
+      users: async () => {
+        const users = await db
+          .select({
+            id: Users.id,
+            name: Users.name,
+            email: Users.email,
+            role: Users.role,
+            status: Users.status,
+          })
+          .from(Users);
+        console.log(users);
+        return users;
+      },
     },
   },
 });
