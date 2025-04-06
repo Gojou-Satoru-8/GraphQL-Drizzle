@@ -43,7 +43,7 @@ export const Users = pgTable(
   (table) => {
     // Table level modifications are done here
     return [
-      // emailIndex: index("email_idx").on(table.email),
+      // index("email_idx").on(table.email),
       // Either specify unique on row and index here or set unique index together
       uniqueIndex("email_idx").on(table.email),
       // Example to set unique constraint on multiple columns
