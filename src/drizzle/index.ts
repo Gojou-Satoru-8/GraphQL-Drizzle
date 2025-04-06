@@ -1,3 +1,4 @@
+// This is the connection file for Drizzle which makes the db object available for use in the rest of the application.
 import { drizzle } from "drizzle-orm/neon-http";
 import { neon } from "@neondatabase/serverless";
 import * as schema from "./schema";

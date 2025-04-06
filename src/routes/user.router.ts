@@ -8,5 +8,6 @@ router
   .get(userController.getUserById)
   .patch(userController.updateUserById)
   .delete(userController.deleteUserById);
-
+router.route("/preferences").get(userController.getAllUsersWithPreferences);
+router.route("/preferences/:id").get(userController.getUserWithPreferencesById);
 export default router;

@@ -3,11 +3,11 @@ import helmet from "helmet";
 import cors from "cors";
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
-import { schema } from "./graphql";
+import { schema } from "@/graphql/schema";
 import { errorMiddleware } from "@/middlewares/error.js";
 import userRouter from "@/routes/user.router";
-import { db } from "./drizzle";
-import { Users } from "./drizzle/schema";
+// import { db } from "@/drizzle/index";
+import * as userResolvers from "@/graphql/resolvers/user.resolver";
 
 export const envMode = process.env.NODE_ENV?.trim() || "DEVELOPMENT";
 const portWeb = 3000;
@@ -17,21 +17,19 @@ const server = new ApolloServer({
   typeDefs: schema,
   resolvers: {
     Query: {
-      hello: () => "Hello world!",
-      hello2: () => "Hello world!",
-      users: async () => {
-        const users = await db
-          .select({
-            id: Users.id,
-            name: Users.name,
-            email: Users.email,
-            role: Users.role,
-            status: Users.status,
-          })
-          .from(Users);
-        console.log(users);
-        return users;
-      },
+      // hello: () => "Hello world!",
+      // hello2: () => "Hello world!",
+      users: userResolvers.getAllUsers,
+      user: userResolvers.getUserById,
+      // usersWithPreferences: userResolvers.getAllUsersWithPreferences,
+      // userWithPreferences: userResolvers.getUserWithPreferencesById,
+      usersWithPreferences: userResolvers.getAllUsers,
+      userWithPreferences: userResolvers.getUserById,
+    },
+    UserWithPreferences: {
+      // NOTE: Because we added the resolver below, it has added the preference object, and thus we don't need joins
+      // to get preference object populated inside each userWithPreferences
+      preferences: userResolvers.populatePreferences,
     },
   },
 });

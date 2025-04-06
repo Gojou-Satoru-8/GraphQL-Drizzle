@@ -28,7 +28,9 @@ export const getAllUsers = async () => {
     // In select(), we can pass an object to specify columns to include with aliases:
     .select({
       id: Users.id,
-      fullName: Users.name, // (fullName is the alias, and name is the column, ie "SELECT name as fullName")
+      email: Users.email,
+      // fullName: Users.name, // (fullName is the alias, and name is the column, ie "SELECT name as fullName")
+      name: Users.name,
       age: Users.age,
       role: Users.role,
       theme: UserPreferences.theme, // Can also have other column values (if join() is chained later)
@@ -68,11 +70,61 @@ export const ageGroupBy = async () => {
   return results.at(0);
 };
 
+export const getAllUsersWithPreferences = async () => {
+  const results = await db
+    .select({
+      id: Users.id,
+      name: Users.name,
+      email: Users.name,
+      // NOTE: Select is very customizable, as JOIN table's fields are nested into below object for cleaner structure
+      preferences: {
+        userId: UserPreferences.userId,
+        emailUpdates: UserPreferences.emailUpdates,
+        theme: UserPreferences.theme,
+      },
+    })
+    .from(Users)
+    .innerJoin(UserPreferences, eq(Users.id, UserPreferences.userId));
+  console.log("🚀 ~ getAllUsersWithPreferences ~ results:", results);
+  return results;
+};
+
 export const getUserById = async (userId: number) => {
   // NOTE: select always returns an array of objects, with properties specified in the object passed to select()
   // Empty array if no match foundin where clause
   const results = await db.select().from(Users).where(eq(Users.id, userId));
   console.log("🚀 ~ getUserById ~ results:", results);
+  return results.length === 0 ? null : results.at(0);
+};
+
+export const getUserWithPreferencesById = async (userId: number) => {
+  const results = await db
+    .select({
+      id: Users.id,
+      name: Users.name,
+      email: Users.name,
+      preferences: {
+        userId: UserPreferences.userId,
+        emailUpdates: UserPreferences.emailUpdates,
+        theme: UserPreferences.theme,
+      },
+    })
+    .from(Users)
+    .where(eq(Users.id, userId))
+    .innerJoin(UserPreferences, eq(Users.id, UserPreferences.userId));
+  console.log("🚀 ~ getUserWithPreferenceById ~ results:", results);
+  return results.length === 0 ? null : results.at(0);
+};
+
+export const getPreferencesByUserId = async (userId: number) => {
+  const results = await db
+    .select({
+      userId: UserPreferences.id,
+      emailUpdates: UserPreferences.emailUpdates,
+      theme: UserPreferences.theme,
+    })
+    .from(UserPreferences);
+  console.log("🚀 ~ getPreferencesByUserId ~ results:", results);
   return results.length === 0 ? null : results.at(0);
 };
 
