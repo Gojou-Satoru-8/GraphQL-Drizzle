@@ -23,14 +23,20 @@ const server = new ApolloServer({
       user: userResolvers.getUserById,
       // usersWithPreferences: userResolvers.getAllUsersWithPreferences,
       // userWithPreferences: userResolvers.getUserWithPreferencesById,
+      // NOTE: Above two resolvers rely on joins, and bottom two resolvers rely on the preferences resolver further below:
       usersWithPreferences: userResolvers.getAllUsers,
       userWithPreferences: userResolvers.getUserById,
     },
     UserWithPreferences: {
       // NOTE: Because we added the resolver below, it has added the preference object, and thus we don't need joins
-      // to get preference object populated inside each userWithPreferences
+      // to get preference object populated inside other resolvers
       preferences: userResolvers.populatePreferences,
     },
+    // NOTE: Let's say the UserPreferences object has a property called "preferredTheme", but the database column is "theme", in that case we can either rename the property while querying using Drizzle or add a resolver for this:
+    // UserPreferences: {
+    //   preferredTheme: userResolvers.getPreferredTheme,
+    // },
+    // This is helpful when there are numeric keys in an object which graphql doesn't accept in the schema, like "123": "abc", in that case the graphql schema can be _123 and we can return the value of "123" in the resolver for the key _123, using a resolver.
   },
 });
 

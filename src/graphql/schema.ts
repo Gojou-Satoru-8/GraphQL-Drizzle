@@ -14,6 +14,7 @@ export const schema = `#graphql
         userId: Int!
         emailUpdates: Boolean!
         theme: String
+        # preferredTheme: String
     }
 
     type UserWithPreferences {
@@ -29,8 +30,7 @@ export const schema = `#graphql
         users: [User]
         user (userId: Int!): User
         usersWithPreferences: [UserWithPreferences]
-        userWithPreferences (userId: Int!): UserWithPreferences
-        
+        userWithPreferences (userId: Int!): UserWithPreferences        
     }
 
 `;

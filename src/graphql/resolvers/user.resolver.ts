@@ -21,8 +21,15 @@ export const getUserWithPreferencesById = async (parent: any, arg: { userId: num
 };
 
 export const populatePreferences = async (parent: any) => {
+  // Here, parent is the UserWithPreferences object
   console.log("🚀 ~ populatePreferences ~ parent:", parent); // Parent is the schema one level above
   // For preference field of type UserPreferences, nested in schema UserWithPreferences, running this function to actually
   // populate the preferences property means we wouldn't need to run joins in the database-service level.
   return userService.getPreferencesByUserId(parent?.id);
 };
+
+// export const getPreferredTheme = async (parent: any) => {
+//   // NOTE: Here the parent will be the UserPreferences object, which is used inside UserWithPererences type and UsersWithPreferences type. Thus everytime we query these two, the UserPreferences object will be populated by the above populatePreferences, but if we were to rename the theme property to preferredTheme in GraphQL schema, we would need to add a resolver for this:
+//   console.log("🚀 ~ getPreferredTheme ~ parent:", parent);
+//   return parent.theme;
+// };
