@@ -33,3 +33,46 @@ export const populatePreferences = async (parent: any) => {
 //   console.log("🚀 ~ getPreferredTheme ~ parent:", parent);
 //   return parent.theme;
 // };
+
+export const getThemeForUser = (parent: any) => {
+  return userService.getThemeByUserId(parent.id);
+};
+
+type newUserArgsType = { name: string; age: number; email: string; role?: string };
+
+export const createUser = async (parent: any, args: newUserArgsType) => {
+  const newUser = await userService.insertUser({ ...args });
+  const newUserPreferences = await userService.insertUserPreferences(newUser?.id as number);
+  // if (!newUser) return "Failed to create user";
+  // else return newUser;
+  return { ...newUser, theme: newUserPreferences?.theme };
+};
+
+type updateUserArgsType = {
+  userId: number;
+  updateValues: { name?: string; age?: number; email?: string; role?: "admin" | "basic" };
+};
+export const updateUser = async (parent: any, args: updateUserArgsType) => {
+  // const updatedUser = await userService.updateUserById(args.userId, args.updateValues);
+  // return updatedUser;
+  return userService.updateUserById(args.userId, args.updateValues);
+};
+
+type deleteUserType = {
+  userId: number;
+};
+export const deleteUser = async (parent: any, args: deleteUserType) => {
+  return userService.deleteUserById(args.userId);
+};
+
+type updatePreferencesArgsType = {
+  userId: number;
+  updateValues: {
+    theme?: "light" | "dark" | "system";
+    emailUpdates?: boolean;
+  };
+};
+
+export const updatePreferencesByUserId = async (parent: any, args: updatePreferencesArgsType) => {
+  return userService.updatePreferencesByUserId(args.userId, args.updateValues);
+};

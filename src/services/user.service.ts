@@ -123,7 +123,8 @@ export const getPreferencesByUserId = async (userId: number) => {
       emailUpdates: UserPreferences.emailUpdates,
       theme: UserPreferences.theme,
     })
-    .from(UserPreferences);
+    .from(UserPreferences)
+    .where(eq(UserPreferences.userId, userId));
   console.log("🚀 ~ getPreferencesByUserId ~ results:", results);
   return results.length === 0 ? null : results.at(0);
 };
@@ -136,7 +137,8 @@ export const insertUser = async (values: any) => {
       target: Users.email,
       set: { ...values },
     })
-    .returning({ id: Users.id, name: Users.name }); // Can be thought of as alias on returning column
+    .returning();
+  // .returning({ id: Users.id, name: Users.name }); // Can be thought of as alias on returning column
   console.log("🚀 ~ insertUser ~ results:", results);
   return results.length === 0 ? null : results.at(0);
 };
@@ -154,7 +156,8 @@ export const insertUserPreferences = async (userIdFK: number) => {
   return results.length === 0 ? null : results.at(0);
 };
 
-export const updateUserById = async (userId: number, values: any) => {
+type updateUserValues = { name?: string; age?: number; email?: string; role?: "admin" | "basic" };
+export const updateUserById = async (userId: number, values: updateUserValues) => {
   // NOTE: db.update returns an object with command: "UPDATE", rowCount: int, rows: array etc
   // But if appended with returning(), it only returns the rows: array with columns desired
   const results = await db
@@ -171,11 +174,47 @@ export const updateUserById = async (userId: number, values: any) => {
 export const deleteUserById = async (userId: number) => {
   // NOTE: db.update returns an object with command: "DELETE", rowCount: int, rows: array etc
   // But if appended with returning(), it only returns the rows: array with columns desired
-  const results = await db
+
+  // DELETE UserPreferences row first
+  const results1 = await db
+    .delete(UserPreferences)
+    .where(eq(UserPreferences.userId, userId))
+    .returning({ id: UserPreferences.id, userId: UserPreferences.userId });
+  console.log("🚀 ~ deleteUserPereferencesByUserId ~ results1:", results1);
+  // if (results1.length === 0) return null;
+  // Then DELETE from Users table
+  const results2 = await db
     .delete(Users)
     .where(eq(Users.id, userId))
     .returning({ id: Users.id, name: Users.name });
 
-  console.log("🚀 ~ deleteUserById ~ results:", results);
+  console.log("🚀 ~ deleteUserById ~ results:", results2);
+  return results2.length === 0 ? null : results2.at(0);
+};
+
+// NOTE: To be used in GraphQL User's theme resolver
+export const getThemeByUserId = async (userId: number) => {
+  const results = await db
+    .select({ theme: UserPreferences.theme })
+    .from(UserPreferences)
+    .where(eq(UserPreferences.userId, userId));
+
+  console.log("🚀 ~ getThemeByUserId ~ result:", results, "for UserId: ", userId);
+
+  return results.length === 0 ? null : results.at(0)?.theme;
+};
+
+type preference = { emailUpdates?: boolean; theme?: "light" | "dark" | "system" };
+export const updatePreferencesByUserId = async (userId: number, preference: preference) => {
+  console.log("🚀 ~ updatePreferencesByUserId ~ preference:", preference);
+
+  const results = await db
+    .update(UserPreferences)
+    // .set({ emailUpdates: preference.emailUpdates, theme: preference.theme });
+    .set({ ...preference })
+    .where(eq(UserPreferences.userId, userId))
+    .returning();
+  console.log("🚀 ~ updatePreferences ~ results:", results);
+
   return results.length === 0 ? null : results.at(0);
 };

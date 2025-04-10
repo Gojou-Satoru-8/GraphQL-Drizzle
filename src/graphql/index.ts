@@ -1,5 +1,5 @@
 import { ApolloServer } from "@apollo/server";
-import { startStandaloneServer } from "@apollo/server/standalone";
+// import { startStandaloneServer } from "@apollo/server/standalone";
 import { schema } from "@/graphql/schema";
 import * as userResolvers from "@/graphql/resolvers/user.resolver";
 
@@ -54,6 +54,10 @@ const createGraphQLServer = async () => {
         usersWithPreferences: userResolvers.getAllUsers,
         userWithPreferences: userResolvers.getUserById,
       },
+      User: {
+        // NOTE: This eliminates the use of join in querying for user / users
+        theme: userResolvers.getThemeForUser,
+      },
       UserWithPreferences: {
         // NOTE: Because we added the resolver below, it has added the preference object, and thus we don't need joins
         // to get preference object populated inside other resolvers
@@ -66,6 +70,9 @@ const createGraphQLServer = async () => {
       // This is helpful when there are numeric keys in an object which graphql doesn't accept in the schema, like "123": "abc", in that case the graphql schema can be _123 and we can return the value of "123" in the resolver for the key _123, using a resolver.
       Mutation: {
         createUser: userResolvers.createUser,
+        updateUser: userResolvers.updateUser,
+        deleteUser: userResolvers.deleteUser,
+        updatePreferences: userResolvers.updatePreferencesByUserId,
       },
     },
   });

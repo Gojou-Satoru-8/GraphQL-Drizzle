@@ -5,9 +5,16 @@ export const schema = `#graphql
         id: Int!
         name: String!
         email: String!
-        # age: Number
+        age: Int
         role: String!
         theme: String 
+    }
+
+    input UserUpdateInput {
+        name: String, 
+        email: String,
+        age: Int,
+        role: Int
     }
 
     type UserPreferences {
@@ -15,6 +22,11 @@ export const schema = `#graphql
         emailUpdates: Boolean!
         theme: String
         # preferredTheme: String
+    }
+
+    input UserPreferencesUpdateInput {
+        emailUpdates: Boolean,
+        theme: String
     }
 
     type UserWithPreferences {
@@ -33,4 +45,10 @@ export const schema = `#graphql
         userWithPreferences (userId: Int!): UserWithPreferences        
     }
 
+    type Mutation {
+        createUser (name: String!, age: Int, email: String!, role: String): User
+        updateUser (userId: Int!, updateValues: UserUpdateInput): User
+        deleteUser (userId: Int!): User
+        updatePreferences (userId: Int!, updateValues: UserPreferencesUpdateInput): UserPreferences
+    }
 `;
