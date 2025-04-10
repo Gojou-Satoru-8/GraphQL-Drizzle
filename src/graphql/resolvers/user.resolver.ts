@@ -62,7 +62,14 @@ type deleteUserType = {
   userId: number;
 };
 export const deleteUser = async (parent: any, args: deleteUserType) => {
-  return userService.deleteUserById(args.userId);
+  const deletedUserPreferences = await userService.deleteUserPreferencesById(args.userId);
+  // NOTE: As the preference row is deleted, we won't be able to populate theme in case of deletion (via the theme resolver under User namespace). It will always be null, as the theme resolver will always run when we want the theme to be returned (in GraphQL client), but it will never find such a row upon querying, hence null.
+  const deletedUser = await userService.deleteUserById(args.userId);
+  // console.log("Deleting user :", {
+  //   ...deletedUser,
+  //   theme: deletedUserPreferences?.theme,
+  // });
+  return { ...deletedUser, theme: deletedUserPreferences?.theme };
 };
 
 type updatePreferencesArgsType = {

@@ -172,24 +172,28 @@ export const updateUserById = async (userId: number, values: updateUserValues) =
 };
 
 export const deleteUserById = async (userId: number) => {
-  // NOTE: db.update returns an object with command: "DELETE", rowCount: int, rows: array etc
+  // NOTE: db.delete returns an object with command: "DELETE", rowCount: int, rows: array etc
   // But if appended with returning(), it only returns the rows: array with columns desired
 
-  // DELETE UserPreferences row first
-  const results1 = await db
-    .delete(UserPreferences)
-    .where(eq(UserPreferences.userId, userId))
-    .returning({ id: UserPreferences.id, userId: UserPreferences.userId });
-  console.log("🚀 ~ deleteUserPereferencesByUserId ~ results1:", results1);
-  // if (results1.length === 0) return null;
-  // Then DELETE from Users table
-  const results2 = await db
+  // Only possible after deletion of corresponding UserPreferences row, as it would otherwise violate FK constraint
+  const results = await db
     .delete(Users)
     .where(eq(Users.id, userId))
-    .returning({ id: Users.id, name: Users.name });
+    // .returning({ id: Users.id, name: Users.name });
+    .returning();
 
-  console.log("🚀 ~ deleteUserById ~ results:", results2);
-  return results2.length === 0 ? null : results2.at(0);
+  console.log("🚀 ~ deleteUserById ~ results:", results);
+  return results.length === 0 ? null : results.at(0);
+};
+
+export const deleteUserPreferencesById = async (userId: number) => {
+  // Typically used to DELETE UserPreferences row first, and then delete the entry in Users table as well
+  const results = await db
+    .delete(UserPreferences)
+    .where(eq(UserPreferences.userId, userId))
+    .returning();
+  console.log("🚀 ~ deleteUserPereferencesByUserId ~ results:", results);
+  return results.length === 0 ? null : results.at(0);
 };
 
 // NOTE: To be used in GraphQL User's theme resolver
