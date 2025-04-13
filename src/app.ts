@@ -1,10 +1,13 @@
 import express from "express";
 import helmet from "helmet";
 import cors from "cors";
-import { connectGraphQL, createGraphQLServer } from "./graphql";
+import { expressMiddleware } from "@apollo/server/express4";
+import {
+  // connectGraphQL,
+  createGraphQLServer,
+} from "./graphql";
 import { errorMiddleware } from "@/middlewares/error.js";
 import userRouter from "@/routes/user.router";
-import { expressMiddleware } from "@apollo/server/express4";
 
 export const envMode = process.env.NODE_ENV?.trim() || "DEVELOPMENT";
 const portWeb = 3000;

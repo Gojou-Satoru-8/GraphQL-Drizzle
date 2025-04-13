@@ -14,7 +14,7 @@ export const schema = `#graphql
         name: String, 
         email: String,
         age: Int,
-        role: Int
+        role: String
     }
 
     type UserPreferences {

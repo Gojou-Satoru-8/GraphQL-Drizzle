@@ -33,13 +33,13 @@ export const getAllUsers = async () => {
       name: Users.name,
       age: Users.age,
       role: Users.role,
-      theme: UserPreferences.theme, // Can also have other column values (if join() is chained later)
+      // theme: UserPreferences.theme, // Can also have other column values (if join() is chained later)
     })
-    .from(Users)
-    // .where(gte(Users.id, 15))
-    // For joins (innerJoin, leftJoin, rightJoin, fullJoin), the arguments are Table to join, and joining condition
-    // Following is like ".... Users INNER JOIN UserPreferences ON Users.id = UserPreferences.userId"
-    .innerJoin(UserPreferences, eq(Users.id, UserPreferences.userId));
+    .from(Users);
+  // .where(gte(Users.id, 15))
+  // For joins (innerJoin, leftJoin, rightJoin, fullJoin), the arguments are Table to join, and joining condition
+  // Following is like ".... Users INNER JOIN UserPreferences ON Users.id = UserPreferences.userId"
+  // .innerJoin(UserPreferences, eq(Users.id, UserPreferences.userId));
   // NOTE: If you're already selecting columns with non-empty {} passed as args, you gotta select columns from the
   // child table also, or else they won't show
   console.log("🚀 ~ getAllUsers ~ results:", results);
@@ -119,7 +119,7 @@ export const getUserWithPreferencesById = async (userId: number) => {
 export const getPreferencesByUserId = async (userId: number) => {
   const results = await db
     .select({
-      userId: UserPreferences.id,
+      userId: UserPreferences.userId,
       emailUpdates: UserPreferences.emailUpdates,
       theme: UserPreferences.theme,
     })
